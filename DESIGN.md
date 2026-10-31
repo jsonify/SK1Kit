@@ -142,6 +142,7 @@ them all. Helpers: `SK1.palette(for: ColorScheme)`, `Color(sk1Hex:)` / `Color(sk
 | Glass | `Retro.drawGlass`, `drawChipGlass` | `SKGlass(_ kind:radius:)`, kinds `.display`, `.chip` | `Text("42").padding(6).background(SKGlass(.chip))` |
 | LCD | `Retro.drawLCD` | `SKLCD(radius:inset:) { }` | `SKLCD { Text("READY") }.frame(height: 30)` |
 | Readout | `LCDReadout` | `SKReadout(_:height:)` | `SKReadout("Scrolling… 4 frames")` |
+| Text field | `LCDTextBox` (planned there as "LCD text field") | `SKTextField(_:text:prompt:height:)` | `SKTextField("Role", text: $role, prompt: "Chair, Treasurer…")` |
 | Chip | `LCDChip` | `SKChip(_:minWidth:height:)` | `SKChip("100%")` |
 | Display | `LCDDisplay` (`LCDDisplay.swift`) | `SKDisplay(title:detail:message:number:digits:unit:live:height:)` | `SKDisplay(title: "Rectangle", message: "Drag to draw", number: 100, unit: "%")` |
 | Seven-segment | `SevenSegment.draw`, `SevenSegmentView` | `SevenSegmentShape(_:spacing:segments:)`, `SKSevenSegment(_:digitHeight:spacing:color:)` | `SKSevenSegment("12:05", digitHeight: 26)` |
@@ -151,11 +152,13 @@ them all. Helpers: `SK1.palette(for: ColorScheme)`, `Color(sk1Hex:)` / `Color(sk
 | Settings row | `SettingsWindow.row` | `SKRow(title:subtitle:) { control }` | `SKRow(title: "Microphone") { SKChip("Built-in") }` |
 | Settings group | `SettingsWindow.group` | `SKGroup(caption:note:) { rows }` | `SKGroup(caption: "Recording") { rowA; rowB }` |
 
-Behaviour that is the same everywhere: a key presses down at once (no animation) and gives a light haptic on iOS;
-keys, toggles and segments take taps in at least 44 x 44 pt on iOS; captions and hints scale with Dynamic Type on
-iOS (captions up to `.accessibility1`); blinking lamps blink at 1 s (`SK1.blinkLit`) on a `TimelineView` and stay
-lit with Reduce Motion; every lamp, indicator, toggle and timer says its state to VoiceOver ("Recording: on, 1 minute
-12 seconds"), and captions are read in normal case.
+Behaviour that is the same everywhere: a key presses down at once (no animation) and gives a light haptic on iOS; keys,
+toggles and segments take taps in at least 44 x 44 pt on iOS; captions and hints scale with Dynamic Type on iOS
+(captions up to `.accessibility1`); blinking lamps blink at 1 s (`SK1.blinkLit`) on a `TimelineView` and stay lit with
+Reduce Motion; every lamp, indicator, toggle and timer says its state to VoiceOver ("Recording: on, 1 minute 12
+seconds"), and captions are read in normal case. A text field is one line of semibold 14 pt mono LCD ink on glass in the
+readout's bezel, 36 pt tall, its prompt in the ink at 45%; while it has focus an orange 1.5 pt hairline rings the bezel
+(orange is "on"), and tapping anywhere on the glass focuses it.
 
 ### Planned
 
@@ -164,5 +167,4 @@ lit with Reduce Motion; every lamp, indicator, toggle and timer says its state t
 | Pop-up | `PillPopUp` | `SK1Picker` with an LCD chip and optional stepper |
 | Knob | `RetroKnob` | `SK1Knob` (the arithmetic is `SK1.KnobScale`) |
 | Speaker grille | `SpeakerGrille` | `SK1Grille` |
-| LCD text field | `LCDTextBox` | a text field on an LCD chip |
 | AppKit views | all of the above | `SK1AppKit`, for apps that are not SwiftUI |

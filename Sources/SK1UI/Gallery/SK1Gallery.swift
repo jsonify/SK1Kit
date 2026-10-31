@@ -11,6 +11,8 @@ public struct SK1Gallery: View {
     @State private var mic = true
     @State private var launch = false
     @State private var tool = 0
+    @State private var name = "Dana Reyes"
+    @State private var role = ""
 
     /// `scrolls` false lays it out at full height (for rendering it to an image).
     public init(scrolls: Bool = true) { self.scrolls = scrolls }
@@ -125,6 +127,12 @@ public struct SK1Gallery: View {
                 SKDisplay(title: "Filled rectangle", detail: "Key R", message: "Drag to draw", number: 100, unit: "%")
                 SKDisplay(title: "Select", message: "Moving 2 annotations", number: 1200, unit: "%", live: true)
                 SKDisplay(title: "Transcribing", message: "Whisper small · 42%", live: false)
+            }
+
+            section("Text field") {
+                SKTextField("Name", text: $name)
+                SKTextField("Role", text: $role, prompt: "Chair, Treasurer, Member…")
+                SKTextField("Disabled", text: .constant("Read only")).disabled(true)
             }
 
             section("Seven-segment") {
