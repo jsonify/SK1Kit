@@ -11,7 +11,8 @@ concurrency:
   cancel-in-progress: true
 
 jobs:
-  # SK1Tokens imports Foundation only, so it builds and tests on Linux.
+  # SK1Tokens imports Foundation only, so it builds and tests on Linux. SK1UI's SwiftUI files are wrapped in
+  # `#if canImport(SwiftUI)`, so on Linux it builds with only its Foundation text logic, which SK1UITests covers.
   linux:
     runs-on: ubuntu-latest
     container: swift:6.0
@@ -21,7 +22,12 @@ jobs:
       - name: Toolchain version
         run: swift --version
       - name: Unit tests (warnings are errors)
-        run: swift test -Xswiftc -warnings-as-errors
+        shell: bash
+        run: swift test -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/test-linux.log"
+      - name: Compiler diagnostics
+        if: always()
+        shell: bash
+        run: .github/scripts/report-diagnostics.sh "$RUNNER_TEMP/test-linux.log"
 
   apple:
     runs-on: macos-latest
@@ -39,11 +45,29 @@ jobs:
         run: |
           xcodebuild -version
           swift --version
+      # The gallery snapshot test writes its PNGs to SK1_SNAPSHOT_DIR.
       - name: Unit tests on macOS (warnings are errors)
-        run: swift test -Xswiftc -warnings-as-errors
+        shell: bash
+        env:
+          SK1_SNAPSHOT_DIR: ${{ runner.temp }}/sk1-gallery
+        run: swift test -Xswiftc -warnings-as-errors 2>&1 | tee "$RUNNER_TEMP/test-macos.log"
+      - name: Upload gallery snapshots
+        uses: actions/upload-artifact@v4
+        with:
+          name: sk1-gallery
+          path: ${{ runner.temp }}/sk1-gallery
+          if-no-files-found: error
       - name: Schemes
         run: xcodebuild -list
+      # With more than one library product, the package's scheme that builds them all is SK1Kit-Package.
       - name: Compile for iOS (warnings are errors)
+        shell: bash
         run: |
-          xcodebuild build -scheme SK1Kit -destination 'generic/platform=iOS' \
-            OTHER_SWIFT_FLAGS='-warnings-as-errors'
+          SCHEME=$(xcodebuild -list -json | python3 -c 'import json, sys; s = json.load(sys.stdin)["workspace"]["schemes"]; print("SK1Kit-Package" if "SK1Kit-Package" in s else "SK1Kit")')
+          echo "Scheme: $SCHEME"
+          xcodebuild build -scheme "$SCHEME" -destination 'generic/platform=iOS' \
+            OTHER_SWIFT_FLAGS='-warnings-as-errors' 2>&1 | tee "$RUNNER_TEMP/build-ios.log"
+      - name: Compiler diagnostics
+        if: always()
+        shell: bash
+        run: .github/scripts/report-diagnostics.sh "$RUNNER_TEMP/test-macos.log" "$RUNNER_TEMP/build-ios.log"

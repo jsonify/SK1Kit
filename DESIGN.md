@@ -73,6 +73,7 @@ In code: `SK1.orange` and so on. `SK1.blinkLit(_:)` says whether a blinking lamp
 | `chipBottom` | `#BFC6A9` |
 | `teal` | `#1F9E86` |
 | `recRed` | `#E0402F` |
+| `amber` | `#8A5300` (warning lamp; from Minits, not in Skreener) |
 | `lampDimmed` | `0.2` (alpha between blinks) |
 
 Contrast: `SK1.contrast(_:_:)` is the WCAG 2 ratio. Text tokens are tested at 4.5:1 or better on what they sit on, in both palettes.
@@ -118,25 +119,50 @@ In code: `SK1.Metrics`, in points.
 
 Also in `SK1Tokens`: `SK1.SevenSegment` (digit geometry: 20 x 36 box, 3.6 thick, 0.7 gaps, 5 degree lean) and `SK1.KnobScale` (270 degree sweep from 225 degrees; drag arithmetic).
 
-## Components (planned, phase 2)
+## Components (SK1UI)
 
-None of these exist in this package yet. Each is a SwiftUI form of a Skreener AppKit view.
+`SK1UI` is the SwiftUI form of Skreener's AppKit views (iOS 17+, macOS 14+). Each component ports the drawing maths
+of its Skreener source (gradients and their stops, radii, skirts, inner shadows, lips, hairline edges, glows and
+alphas) to SwiftUI, takes every colour from `SK1Tokens` and follows `@Environment(\.colorScheme)`. `SK1Gallery` shows
+them all. Helpers: `SK1.palette(for: ColorScheme)`, `Color(sk1Hex:)` / `Color(sk1Hex:brightness:)`, `Font.sk1(_:)`.
+
+| Component | Skreener source | SwiftUI API | Example |
+|---|---|---|---|
+| Chassis | `ChassisView` (`Retro.swift`) | `.sk1Chassis()` | `ContentView().sk1Chassis()` |
+| Plate | `Retro.drawPlate`, `ChassisPlate` | `SKPlate(radius:) { }` | `SKPlate { bar.padding(12) }` |
+| Well | `Retro.drawWell`, `RetroWell` | `SKWell(radius:) { }` | `SKWell { rows.padding(14) }` |
+| Groove | `RetroGroove` | `SKGroove(_ axis:)` | `SKGroove()`, `SKGroove(.vertical)` |
+| Caption, hint | `RetroLabel`, `RetroUI.hint` | `SKCaption(_:tone:)`, `.sk1Hint()`, `Font.sk1(_:)` | `SKCaption("Output", tone: .soft)` |
+| Keycap | `Retro.drawKey`, `keyColors`, `drawOnBar`; `PillButton` `.keycap` and `.round` | `.buttonStyle(.sk1Key(_:isOn:size:))`; variants `.cream`, `.orange`, `.charcoal`, `.round`; sizes `.regular` (30), `.small` (26), `.large` (56, full width) | `Button("Save") { }.buttonStyle(.sk1Key(.orange))` |
+| Keycap tray | `KeycapTray` | `SKKeyTray(caption:) { keys }` | `SKKeyTray(caption: "Tools") { penKey; eraserKey }` |
+| Toggle | `Retro.drawToggleSquare`, `PillButton` `.toggle` | `.toggleStyle(.sk1Square)` | `Toggle("Mic", isOn: $mic).toggleStyle(.sk1Square)` |
+| Switch | `RetroSwitch` | `.toggleStyle(.sk1Switch)` | `Toggle("Launch", isOn: $on).toggleStyle(.sk1Switch)` |
+| Indicator | `RetroIndicator` | `SKIndicator(_:isOn:)` | `SKIndicator("Mic", isOn: true)` |
+| Segmented | `RetroSegmented` | `SKSegmented(selection:options:caption:)` | `SKSegmented(selection: $tab, options: [.init(.notes, "Notes"), .init(.review, "Review", badge: "3")])` |
+| Glass | `Retro.drawGlass`, `drawChipGlass` | `SKGlass(_ kind:radius:)`, kinds `.display`, `.chip` | `Text("42").padding(6).background(SKGlass(.chip))` |
+| LCD | `Retro.drawLCD` | `SKLCD(radius:inset:) { }` | `SKLCD { Text("READY") }.frame(height: 30)` |
+| Readout | `LCDReadout` | `SKReadout(_:height:)` | `SKReadout("Scrolling… 4 frames")` |
+| Chip | `LCDChip` | `SKChip(_:minWidth:height:)` | `SKChip("100%")` |
+| Display | `LCDDisplay` (`LCDDisplay.swift`) | `SKDisplay(title:detail:message:number:digits:unit:live:height:)` | `SKDisplay(title: "Rectangle", message: "Drag to draw", number: 100, unit: "%")` |
+| Seven-segment | `SevenSegment.draw`, `SevenSegmentView` | `SevenSegmentShape(_:spacing:segments:)`, `SKSevenSegment(_:digitHeight:spacing:color:)` | `SKSevenSegment("12:05", digitHeight: 26)` |
+| Timer | `ElapsedLCD` | `SKElapsed(seconds:recording:paused:detail:size:)` | `SKElapsed(seconds: 72, recording: true, paused: false)` |
+| Lamp | `Retro.drawLamp` | `SKLamp(color:lit:glow:size:label:blinking:)`; colours `.teal`, `.red`, `.orange`, `.success`, `.warning`, `.danger` | `SKLamp(color: .danger, lit: true, label: "Recording", blinking: true)` |
+| Level meter | new (Minits) | `SKLevelMeter(levels:height:spacing:)` | `SKLevelMeter(levels: recentLevels)` |
+| Settings row | `SettingsWindow.row` | `SKRow(title:subtitle:) { control }` | `SKRow(title: "Microphone") { SKChip("Built-in") }` |
+| Settings group | `SettingsWindow.group` | `SKGroup(caption:note:) { rows }` | `SKGroup(caption: "Recording") { rowA; rowB }` |
+
+Behaviour that is the same everywhere: a key presses down at once (no animation) and gives a light haptic on iOS;
+keys, toggles and segments take taps in at least 44 x 44 pt on iOS; captions and hints scale with Dynamic Type on
+iOS (captions up to `.accessibility1`); blinking lamps blink at 1 s (`SK1.blinkLit`) on a `TimelineView` and stay
+lit with Reduce Motion; every lamp, indicator, toggle and timer says its state to VoiceOver ("Recording: on, 1 minute
+12 seconds"), and captions are read in normal case.
+
+### Planned
 
 | Component | Skreener source | Planned SwiftUI form |
 |---|---|---|
-| Chassis | `ChassisView`, `ChassisPlate` (`Retro.swift`) | `SK1Chassis` background and `SK1Plate` container |
-| Well | `RetroWell`, `Retro.drawWell` | `SK1Well` container |
-| Keycap | `PillButton` `.keycap` (`PillButton.swift`) | `SK1KeyStyle` button style with cream, orange and charcoal variants |
-| Toggle | `PillButton` `.toggle`, `RetroSwitch` | `SK1ToggleStyle` |
-| Round key | `PillButton` `.round` | `SK1RoundKeyStyle` |
 | Pop-up | `PillPopUp` | `SK1Picker` with an LCD chip and optional stepper |
-| Keycap tray | `KeycapTray` | `SK1KeyTray` with a caption |
-| Segmented | `RetroSegmented` | `SK1Segmented` |
-| Indicator | `RetroIndicator` | `SK1Indicator` |
-| Lamp | `Retro.drawLamp` | `SK1Lamp` with blink and accessibility label |
-| LCD glass and readout | `Retro.drawLCD`, `LCDReadout`, `LCDChip`, `LCDTextBox` | `SK1LCD`, `SK1LCDChip` |
-| Seven-segment text | `SevenSegmentView` | `SK1SevenSegmentText` (SwiftUI `Canvas`) |
-| Knob | `RetroKnob` | `SK1Knob` |
-| Groove | `RetroGroove` | `SK1Groove` |
-| Caption label | `RetroLabel` | `SK1Caption` and text styles from `TypeScale` |
+| Knob | `RetroKnob` | `SK1Knob` (the arithmetic is `SK1.KnobScale`) |
 | Speaker grille | `SpeakerGrille` | `SK1Grille` |
+| LCD text field | `LCDTextBox` | a text field on an LCD chip |
+| AppKit views | all of the above | `SK1AppKit`, for apps that are not SwiftUI |
