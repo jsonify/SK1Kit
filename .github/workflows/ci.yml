@@ -1,0 +1,49 @@
+name: CI
+
+on:
+  push:
+  pull_request:
+  workflow_dispatch:
+
+# A newer run for the same branch replaces any older one still queued or running.
+concurrency:
+  group: ci-${{ github.head_ref || github.ref }}
+  cancel-in-progress: true
+
+jobs:
+  # SK1Tokens imports Foundation only, so it builds and tests on Linux.
+  linux:
+    runs-on: ubuntu-latest
+    container: swift:6.0
+    timeout-minutes: 20
+    steps:
+      - uses: actions/checkout@v4
+      - name: Toolchain version
+        run: swift --version
+      - name: Unit tests (warnings are errors)
+        run: swift test -Xswiftc -warnings-as-errors
+
+  apple:
+    runs-on: macos-latest
+    timeout-minutes: 30
+    steps:
+      - uses: actions/checkout@v4
+      # Use the newest Xcode on the runner: newer compilers add warnings the default one doesn't report.
+      - name: Select newest Xcode
+        run: |
+          ls -d /Applications/Xcode*.app
+          # Versioned bundles only: the plain Xcode.app is the runner's default, which sorts last.
+          NEWEST=$(ls -d /Applications/Xcode_*.app | sort -V | tail -1)
+          sudo xcode-select -s "$NEWEST"
+      - name: Toolchain versions
+        run: |
+          xcodebuild -version
+          swift --version
+      - name: Unit tests on macOS (warnings are errors)
+        run: swift test -Xswiftc -warnings-as-errors
+      - name: Schemes
+        run: xcodebuild -list
+      - name: Compile for iOS (warnings are errors)
+        run: |
+          xcodebuild build -scheme SK1Kit-Package -destination 'generic/platform=iOS' \
+            OTHER_SWIFT_FLAGS='-warnings-as-errors'
