@@ -10,7 +10,7 @@ principles, tokens and components.
 | Module | State | What it is |
 |---|---|---|
 | `SK1Tokens` | available | Framework-free tokens: palettes and fixed colours as hex numbers, type styles, metrics, WCAG contrast, seven-segment geometry and knob arithmetic. Foundation only; builds on Linux. |
-| `SK1UI` | available | SwiftUI components (iOS 17+, macOS 14+): chassis, plates, wells, keys, toggles, segmented control, LCDs, seven-segment digits, timer, lamps, level meter, settings rows. See `DESIGN.md` for the list. |
+| `SK1UI` | available | SwiftUI components (iOS 17+, macOS 14+): chassis, plates, wells, keys, toggles, segmented control, LCDs, text fields, seven-segment digits, timer, lamps, level meter, settings rows. See `DESIGN.md` for the list. |
 | `SK1AppKit` | planned | AppKit views for macOS apps that are not SwiftUI. |
 
 ## Adding it
@@ -110,7 +110,7 @@ Sources/SK1UI/       Format.swift (text shown and spoken; Foundation only), Colo
                      Retro.draw… ports), Chassis.swift (chassis, plate, well, groove), Type.swift (caption, hint),
                      Keys.swift (key style, tray), Toggles.swift (square, switch, indicator), Segmented.swift,
                      LCD.swift (glass, LCD, readout, chip, display), SevenSegment.swift, Elapsed.swift (timer),
-                     Lamp.swift, LevelMeter.swift, Settings.swift (row, group)
+                     TextField.swift, Lamp.swift, LevelMeter.swift, Settings.swift (row, group)
 Sources/SK1UI/Gallery/ SK1Gallery.swift (every component, with previews)
 Tests/SK1TokensTests/
 Tests/SK1UITests/    FormatTests.swift (also on Linux), GallerySnapshotTests.swift (macOS: renders the gallery)
