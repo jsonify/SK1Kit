@@ -73,6 +73,7 @@ In code: `SK1.orange` and so on. `SK1.blinkLit(_:)` says whether a blinking lamp
 | `chipBottom` | `#BFC6A9` |
 | `teal` | `#1F9E86` |
 | `recRed` | `#E0402F` |
+| `amber` | `#8A5300` (warning lamp; from Minits, not in Skreener) |
 | `lampDimmed` | `0.2` (alpha between blinks) |
 
 Contrast: `SK1.contrast(_:_:)` is the WCAG 2 ratio. Text tokens are tested at 4.5:1 or better on what they sit on, in both palettes.

@@ -61,6 +61,12 @@ final class SK1TokensTests: XCTestCase {
         XCTAssertEqual(SK1.recRed, 0xe0402f)
     }
 
+    /// Amber is Minits' warning colour, not Skreener's; it reads at 4.5:1 or better on the light chassis.
+    func testAmber() {
+        XCTAssertEqual(SK1.amber, 0x8a5300)
+        XCTAssertGreaterThanOrEqual(SK1.contrast(SK1.amber, SK1.light.chassis), 4.5)
+    }
+
     /// Text in both palettes is at least 4.5:1 against what it sits on.
     func testTextContrast() {
         func ratio(_ a: UInt32, _ b: UInt32) -> Double { SK1.contrast(SK1.RGB(hex: a), SK1.RGB(hex: b)) }

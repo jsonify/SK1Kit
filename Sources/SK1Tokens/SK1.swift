@@ -9,7 +9,7 @@ import Foundation
 ///
 /// - `SK1.palette(dark:)` / `SK1.Palette` (`SK1.light`, `SK1.dark`): the colours that change with the appearance.
 ///   The fixed ones: `SK1.orange` (what is on, the main action), the orange and charcoal keys', the LCD's
-///   (`glassTop`…, `chipTop`…, `lcdInk`) and the lamps' (`teal`, `recRed`).
+///   (`glassTop`…, `chipTop`…, `lcdInk`) and the lamps' (`teal`, `recRed`, `amber`).
 /// - `SK1.TypeScale`: the type styles. `SK1.Metrics`: sizes, radii and spacing.
 /// - `SK1.blinkLit(_:)`: whether a blinking lamp is lit (1 s, lit for the first half).
 /// - `SK1.RGB` and `SK1.contrast(_:_:)`: WCAG 2 contrast between two colours.
@@ -103,6 +103,9 @@ public enum SK1 {
     public static let chipTop: UInt32 = 0xcfd5ba, chipMiddle: UInt32 = 0xc7cdb1, chipBottom: UInt32 = 0xbfc6a9
     /// A lamp's teal (a key under the pointer) and the REC lamp's red (the timer's).
     public static let teal: UInt32 = 0x1f9e86, recRed: UInt32 = 0xe0402f
+    /// A warning lamp's amber. It comes from Minits and is not in Skreener (`Retro.swift`); it is the one colour here
+    /// that Skreener does not have.
+    public static let amber: UInt32 = 0x8a5300
     /// How far a blinking lamp dims between blinks.
     public static let lampDimmed: CGFloat = 0.2
 
