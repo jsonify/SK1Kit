@@ -45,5 +45,5 @@ jobs:
         run: xcodebuild -list
       - name: Compile for iOS (warnings are errors)
         run: |
-          xcodebuild build -scheme SK1Kit-Package -destination 'generic/platform=iOS' \
+          xcodebuild build -scheme SK1Kit -destination 'generic/platform=iOS' \
             OTHER_SWIFT_FLAGS='-warnings-as-errors'
