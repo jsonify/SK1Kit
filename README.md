@@ -85,6 +85,16 @@ lists them all with their Skreener sources and an example of each.
 - Locally on a Mac: `SK1_SNAPSHOT_DIR=/tmp/sk1-gallery swift test --filter GallerySnapshotTests` writes the same PNGs.
 - In an app: show `SK1Gallery()` on a debug screen.
 
+### Adopting it in an app
+
+`DESIGN.md` → "Adopting SK1Kit in an app" has the native → SK-1 table, a recipe per kind of screen (launcher popover,
+main window, settings, notice card, sheets), the rules to check each screen against, and the macOS pitfalls.
+
+- `Scripts/sk1-audit.sh <app sources>` lists what is still native, with the SK-1 part to use (`--warn` to report
+  without failing; end a line with `// sk1-audit: ignore` to keep a native control on purpose).
+- `Scripts/install-adoption-kit.sh <app repo>` copies the audit and the `adopt-sk1kit` Claude Code skill
+  (`.claude/skills/adopt-sk1kit/SKILL.md`) into the app, so agents working on it follow the recipes.
+
 ### Local development
 
 Point an app at a checkout next to it instead of the tag: `.package(path: "../SK1Kit")` (XcodeGen: `path: ../SK1Kit`).
@@ -115,6 +125,9 @@ Sources/SK1UI/       Format.swift (text shown and spoken; Foundation only), Colo
 Sources/SK1UI/Gallery/ SK1Gallery.swift (every component, with previews)
 Tests/SK1TokensTests/
 Tests/SK1UITests/    FormatTests.swift (also on Linux), GallerySnapshotTests.swift (macOS: renders the gallery)
+Tests/AuditFixtures/ Native.swift, Adopted.swift: fixtures for sk1-audit (not compiled)
+Scripts/             sk1-audit.sh (what is still native in an app), test-sk1-audit.sh, install-adoption-kit.sh
+.claude/skills/      adopt-sk1kit/SKILL.md (the adoption workflow, for Claude Code)
 DESIGN.md            principles, token tables, components
 CLAUDE.md            notes for agents
 .github/workflows/   ci.yml, commits.yml, release-please.yml
