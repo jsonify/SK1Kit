@@ -13,6 +13,11 @@ public struct SK1Gallery: View {
     @State private var tool = 0
     @State private var name = "Dana Reyes"
     @State private var role = ""
+    @State private var stroke = 3
+    @State private var kept = 100
+    @State private var padding = 24
+    @State private var hovered: String?
+    @State private var watching = true
 
     /// `scrolls` false lays it out at full height (for rendering it to an image).
     public init(scrolls: Bool = true) { self.scrolls = scrolls }
@@ -87,6 +92,44 @@ public struct SK1Gallery: View {
                         Button("Save") {}.buttonStyle(.sk1Key(.orange))
                     }
                 }
+            }
+
+            section("Launcher") {
+                SKStatusStrip(title: hovered ?? "Skreener", detail: hovered == nil ? "v1.18.0 · UP TO DATE" : "⌃⇧4")
+                SKStatusStrip(title: "Skreener", detail: "UPDATE 1.19.0", lamp: .orange, emphasized: true)
+                SKWell {
+                    Grid(horizontalSpacing: 4, verticalSpacing: 4) {
+                        GridRow {
+                            SKTile("Area", systemImage: "viewfinder", legend: "⇧⌘4", onHover: { hovered = $0 ? "Area" : nil }) {}
+                            SKTile("Window", systemImage: "macwindow", legend: "⌃⇧5") {}
+                            SKTile("Fullscreen", systemImage: "display", legend: "⇧⌘3") {}
+                        }
+                        GridRow {
+                            SKTile("Text", systemImage: "text.viewfinder", isOn: true) {}
+                            SKTile("Disabled", systemImage: "nosign") {}.disabled(true)
+                            SKTile("Record", systemImage: "record.circle", legend: "⌃⇧7", variant: .orange) {}
+                        }
+                    }
+                    .padding(6)
+                }
+                SKKeyGroup(caption: "Tools") {
+                    SKCaptionedKey("Draw", systemImage: "scribble.variable") {}
+                    SKCaptionedKey("Watch", systemImage: "eye", lamp: watching) { watching.toggle() }
+                    SKCaptionedKey("Guide", systemImage: "list.number") {}
+                    SKCaptionedKey("Settings", systemImage: "gearshape", variant: .charcoal) {}
+                    SKCaptionedKey("Quit", systemImage: "power", variant: .charcoal) {}
+                }
+            }
+
+            section("Picker and knob") {
+                SKPicker(selection: $stroke, options: [1, 2, 3, 4, 6, 8].map { SKPicker<Int>.Option($0, "\($0) pt") }, caption: "Stroke")
+                SKPicker(selection: .constant("PNG"), options: [SKPicker<String>.Option("PNG", "PNG"), .init("JPEG", "JPEG")], stepper: false)
+                HStack(alignment: .top, spacing: 24) {
+                    SKKnob("Captures kept", selection: $kept, stops: [("25", 25), ("100", 100), ("500", 500), ("All", 0)],
+                           defaultValue: 100)
+                    SKKnob("Padding", value: $padding, in: 0...100, defaultValue: 0) { "\($0) PT" }
+                }
+                SKKnob("Disabled", value: .constant(40), in: 0...100, defaultValue: 0).disabled(true)
             }
 
             section("Toggles and indicators") {

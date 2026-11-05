@@ -50,6 +50,8 @@ final class GallerySnapshotTests: XCTestCase {
         let face = SK1Draw.keyFace(in: CGRect(x: 0, y: 0, width: 40, height: 30), down: false)
         XCTAssertEqual(face, CGRect(x: 0, y: 0, width: 40, height: 28))
         XCTAssertEqual(SK1Draw.keyFace(in: CGRect(x: 0, y: 0, width: 40, height: 30), down: true).minY, 2)
+        XCTAssertEqual(SK1KeySize.mini.height, 18)
+        XCTAssertEqual(SKKnob.knobSize + SKKnob.scaleHeight, 63)
         let rect = CGRect(x: 0, y: 0, width: 100, height: 36)
         XCTAssertTrue(SevenSegmentShape(" ", segments: .lit).path(in: rect).isEmpty)
         XCTAssertFalse(SevenSegmentShape(" ", segments: .unlit).path(in: rect).isEmpty)

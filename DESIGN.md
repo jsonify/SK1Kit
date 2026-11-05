@@ -149,8 +149,25 @@ them all. Helpers: `SK1.palette(for: ColorScheme)`, `Color(sk1Hex:)` / `Color(sk
 | Timer | `ElapsedLCD` | `SKElapsed(seconds:recording:paused:detail:size:)` | `SKElapsed(seconds: 72, recording: true, paused: false)` |
 | Lamp | `Retro.drawLamp` | `SKLamp(color:lit:glow:size:label:blinking:)`; colours `.teal`, `.red`, `.orange`, `.success`, `.warning`, `.danger` | `SKLamp(color: .danger, lit: true, label: "Recording", blinking: true)` |
 | Level meter | new (Minits) | `SKLevelMeter(levels:height:spacing:)` | `SKLevelMeter(levels: recentLevels)` |
+| Status strip | `LauncherLCD` (`MenuLauncher.swift`) | `SKStatusStrip(title:detail:lamp:emphasized:height:)` | `SKStatusStrip(title: "Skreener", detail: "v1.18.0 · UP TO DATE")` |
+| Tile | `LauncherTile` (`MenuLauncher.swift`) | `SKTile(_:systemImage:legend:variant:isOn:onHover:action:)` | `SKTile("Area", systemImage: "viewfinder", legend: "⇧⌘4") { capture() }` |
+| Captioned key | `LauncherKey` (`MenuLauncher.swift`) | `SKCaptionedKey(_:systemImage:variant:lamp:onHover:action:)` | `SKCaptionedKey("Watch", systemImage: "eye", lamp: watching) { toggle() }` |
+| Key group | the launcher's trays | `SKKeyGroup(caption:) { keys }` | `SKKeyGroup(caption: "Tools") { drawKey; watchKey }` |
+| Picker | `PillPopUp` (`.lcd`, `stepper`) | `SKPicker(selection:options:caption:stepper:)`; arrows are `.sk1Key(.round, size: .mini)` | `SKPicker(selection: $stroke, options: strokes, caption: "Stroke")` |
+| Knob | `RetroKnob` | `SKKnob(_:selection:stops:defaultValue:)`, `SKKnob(_:value:in:step:defaultValue:format:)` | `SKKnob("Padding", value: $padding, in: 0...100, defaultValue: 0)` |
 | Settings row | `SettingsWindow.row` | `SKRow(title:subtitle:) { control }` | `SKRow(title: "Microphone") { SKChip("Built-in") }` |
 | Settings group | `SettingsWindow.group` | `SKGroup(caption:note:) { rows }` | `SKGroup(caption: "Recording") { rowA; rowB }` |
+
+The launcher's pieces (Skreener's menu-bar menu): a tile is a 34 pt key (corner radius 7) with its symbol at 15 pt, a
+4 pt lamp 10 pt in from the face's top right corner (teal, white on orange), the title as a caption 4 pt under the key
+and an optional legend in 9 pt mono under that; a captioned key is a 26 pt key with its symbol at 12 pt and an 8 pt
+semibold caption 2 pt under it, with an optional red lamp for a key that turns something on and off. On the Mac both
+sink, and light the tile's lamp, while the pointer is over them, and `onHover` lets a status strip show the key's name
+and shortcut. A key group is a well of radius 8 with the keys 4 pt apart and 6 pt in, sharing its width. The status
+strip is 24 pt of glass (radius 6) with a 9.5 pt heavy caption at the left and 10 pt mono at the right. A picker's chip
+is chip glass 20 pt tall, at least 44 pt wide, in 10 pt bold mono, between 18 pt round arrows 4 pt off; a knob is 52 pt
+with ticks lit orange up to the value (11 round a smooth one), its end values in 8 pt mono under it, and its value on a
+chip in a bezel 10 pt to its right, at least 64 pt wide.
 
 Behaviour that is the same everywhere: a key presses down at once (no animation) and gives a light haptic on iOS; keys,
 toggles and segments take taps in at least 44 x 44 pt on iOS; captions and hints scale with Dynamic Type on iOS
@@ -164,7 +181,5 @@ readout's bezel, 36 pt tall, its prompt in the ink at 45%; while it has focus an
 
 | Component | Skreener source | Planned SwiftUI form |
 |---|---|---|
-| Pop-up | `PillPopUp` | `SK1Picker` with an LCD chip and optional stepper |
-| Knob | `RetroKnob` | `SK1Knob` (the arithmetic is `SK1.KnobScale`) |
 | Speaker grille | `SpeakerGrille` | `SK1Grille` |
 | AppKit views | all of the above | `SK1AppKit`, for apps that are not SwiftUI |

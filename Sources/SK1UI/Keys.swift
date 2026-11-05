@@ -10,12 +10,15 @@ public enum SK1KeySize: Sendable, Hashable {
     case small
     /// The main action on iOS: 56 pt and the full width.
     case large
+    /// A stepper's round arrows, 18 pt (`SKPicker`; Skreener's `PillPopUp` stepper).
+    case mini
 
     public var height: CGFloat {
         switch self {
         case .regular: return SK1.Metrics.keyHeight
         case .small: return SK1.Metrics.popUpHeight
         case .large: return 56
+        case .mini: return 18
         }
     }
 }
