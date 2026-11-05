@@ -1,5 +1,12 @@
 # Changelog
 
+## [0.4.1](https://github.com/jsonify/SK1Kit/compare/v0.4.0...v0.4.1) (2026-11-05)
+
+
+### Bug Fixes
+
+* **audit:** look a few lines ahead for a Toggle's SK-1 style ([#10](https://github.com/jsonify/SK1Kit/issues/10)) ([7027445](https://github.com/jsonify/SK1Kit/commit/7027445b6720a16a1651b18f88f55c27aac21b4b))
+
 ## [0.4.0](https://github.com/jsonify/SK1Kit/compare/v0.3.0...v0.4.0) (2026-11-05)
 
 
