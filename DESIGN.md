@@ -183,3 +183,102 @@ readout's bezel, 36 pt tall, its prompt in the ink at 45%; while it has focus an
 |---|---|---|
 | Speaker grille | `SpeakerGrille` | `SK1Grille` |
 | AppKit views | all of the above | `SK1AppKit`, for apps that are not SwiftUI |
+
+## Adopting SK1Kit in an app
+
+The components alone don't make an app look like Skreener: the screens do. Swapping each native control for its SK-1
+twin gives a flat result; laying each screen out as below gives the real thing. Agents: the `adopt-sk1kit` skill
+(`.claude/skills/adopt-sk1kit/SKILL.md`; `Scripts/install-adoption-kit.sh` copies it into an app) walks through this.
+
+### Native control → SK-1
+
+| Native | SK-1 | Notes |
+|---|---|---|
+| window / sheet / popover background | `.sk1Chassis()` | on every root: each window, each `NavigationSplitView` column, each sheet and popover |
+| `Form` + `Section` | `SKGroup(caption:note:)` of `SKRow(title:subtitle:)` in a scrolling pane | a `Form` you keep: `.scrollContentBackground(.hidden).sk1Chassis()` |
+| `GroupBox`, a card background | `SKWell` (sunken), `SKPlate` (floating) | |
+| `Divider()` | `SKGroove()`, `SKGroove(.vertical)` | menus and context menus keep `Divider()` |
+| `.borderedProminent` | `.sk1Key(.orange)` | one orange key per screen |
+| `.bordered`, `.link`, plain buttons | `.sk1Key()`, `.sk1Key(size: .small)`, `SKCaptionedKey` | `.sk1Key(.charcoal)` for an action apart (Settings, Quit, Delete) |
+| a row of related buttons | `SKKeyTray(caption:)` in a toolbar, `SKKeyGroup(caption:)` in a launcher | the caption names the group |
+| the main actions of a menu or a home screen | `SKTile` in an `SKWell` grid | legends show shortcuts |
+| `Toggle` | `.toggleStyle(.sk1Switch)` in a row, `.sk1Square` in a bar | |
+| `Picker` (menu), `Stepper` | `SKPicker` (◀ chip ▶), `SKPicker(stepper: false)` for a pop-up | |
+| `Picker(.segmented)` | `SKSegmented` | |
+| `Slider`, a number stepper | `SKKnob` (smooth, or click-stop for a few choices) | |
+| `TextField` | `SKTextField` | |
+| section headers, uppercase labels | `SKCaption(_, tone: .soft)` | |
+| secondary text, footnotes | `.sk1Hint()` | |
+| countdowns, counts, timers, progress rings | `SKDisplay`, `SKSevenSegment`, `SKElapsed`, `SKChip` | live numbers belong on the LCD |
+| status line, "what's under the pointer" | `SKStatusStrip`, `SKReadout` | |
+| `Color.accentColor`, a coloured status dot | `SK1.orange` for what is on; `SKLamp` for state | |
+
+`Scripts/sk1-audit.sh <app sources>` lists what is still native, with the SK-1 part to use; a line ending in
+`// sk1-audit: ignore` is skipped, for a control that is meant to stay (a system menu, an overlay with its own look).
+
+### Screen recipes
+
+**Menu-bar popover: a launcher** (Skreener's `MenuLauncher`). Top to bottom, 12 pt in, on `.sk1Chassis()`:
+`SKStatusStrip` (the app's state at rest; the name and shortcut of the key under the pointer while hovering), the
+main actions as `SKTile`s in an `SKWell` (the most important one orange), the app's content (lists in wells, captions
+over them), and a last `SKKeyGroup` of `SKCaptionedKey`s ending in charcoal Settings and Quit.
+
+```swift
+@State private var hovered: (name: String, detail: String)?
+
+VStack(spacing: 10) {
+    SKStatusStrip(title: hovered?.name ?? "MyApp", detail: hovered?.detail ?? status)
+    SKWell {
+        HStack(spacing: 4) {
+            SKTile("Record", systemImage: "record.circle", legend: "⌃⇧7", variant: .orange,
+                   onHover: { hovered = $0 ? ("Record", "⌃⇧7") : nil }) { record() }
+            SKTile("Open", systemImage: "folder", legend: "⌘O") { open() }
+        }
+        .padding(6)
+    }
+    content
+    SKKeyGroup {
+        SKCaptionedKey("History", systemImage: "clock.arrow.circlepath") { history() }
+        SKCaptionedKey("Settings", systemImage: "gearshape", variant: .charcoal) { settings() }
+        SKCaptionedKey("Quit", systemImage: "power", variant: .charcoal) { quit() }
+    }
+}
+.padding(12)
+.frame(width: 320)
+.sk1Chassis()
+```
+
+**Main window: captioned trays over an LCD** (Skreener's editor). A toolbar row of `SKKeyTray(caption:)`s, one per
+group of commands (View, Go, Tools…; the selected mode `isOn`, the primary command the one orange key), then an
+`SKDisplay` the width of the window saying what is going on (the mode, the current item, a live number with its unit,
+LIVE while something runs), then `SKGroove()` and the content. Content sits in wells (`SKWell`) or straight on the
+chassis; lists of rows go in a well with grooves between them.
+
+**Settings: groups of rows.** A scrolling pane, 22 pt margins and 22 pt between groups, of `SKGroup`s whose rows end
+in an SK-1 control: `.sk1Switch` for on/off, `SKKnob` for a number or a few stops, `SKPicker` for a list, `SKChip` for a
+read-only value, `.sk1Key()` for an action. The row's subtitle explains it; the group's note explains the group.
+
+**A notice or alert card.** An `SKPlate` with an LCD line on top (lamp, caption, seven-segment countdown), the title
+and details, then the keys: the action orange, the rest cream, a round key for close.
+
+**Sheets and popovers.** `.sk1Chassis()` on the root (they are windows of their own), `SKGroove()` over the action
+row, Cancel cream and the action orange (charcoal for Delete).
+
+### Rules to check every screen against
+
+1. One chassis per window, and every sheet and popover on it too: nothing white or grey shows.
+2. At most one orange key on screen. When two parts of a screen each have a main action, the lesser one goes cream.
+3. Live numbers (countdowns, counts, timers) are on LCD glass, in seven-segment digits or mono; prose never is.
+4. Groups of controls sit in a tray with a caption; a tray's caption is never a bold heading.
+5. State is a lamp (teal ready, red live, amber warning) with its meaning in the accessibility label.
+6. Nothing native is left that has an SK-1 part (`Scripts/sk1-audit.sh` passes, or each finding is marked ignore with a
+   reason).
+
+### macOS pitfalls
+
+- A `NavigationSplitView` sidebar draws its own material behind the list: put `.scrollContentBackground(.hidden)
+  .sk1Chassis()` on the sidebar and on the detail, not on the split view.
+- `Form` and `List` paint their own background: `.scrollContentBackground(.hidden)` before `.sk1Chassis()`.
+- A `Menu`'s label is drawn by AppKit and loses custom drawing; use `SKPicker` (it lists its choices in a popover).
+- A `MenuBarExtra(.window)` popover: `.sk1Chassis()` on its root view, with a fixed width.
+- Keys don't animate: don't wrap SK-1 controls in `withAnimation` or `.animation`.

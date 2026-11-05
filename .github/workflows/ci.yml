@@ -28,6 +28,12 @@ jobs:
         if: always()
         shell: bash
         run: .github/scripts/report-diagnostics.sh "$RUNNER_TEMP/test-linux.log"
+      # The audit apps run to find what is still native; its fixtures, and the kit's own gallery, which must pass it.
+      - name: sk1-audit
+        shell: bash
+        run: |
+          Scripts/test-sk1-audit.sh
+          Scripts/sk1-audit.sh Sources/SK1UI/Gallery
 
   apple:
     runs-on: macos-latest

@@ -13,3 +13,7 @@ extracted from Skreener's `Retro*.swift`. `DESIGN.md` is the spec; `README.md` i
   the next version from them and CI rejects PRs whose commits don't match.
 - Keep `DESIGN.md` and `README.md` current with every change.
 - Token values must stay identical to Skreener's (`Retro.swift`) until Skreener adopts the package.
+- A new component replaces something native: add its row to the native → SK-1 table in `DESIGN.md` ("Adopting SK1Kit
+  in an app"), a rule for the native pattern to `Scripts/sk1-audit.sh` with a line for it in
+  `Tests/AuditFixtures/Native.swift` and its id in `Scripts/test-sk1-audit.sh`, and anything the recipes should use to
+  `.claude/skills/adopt-sk1kit/SKILL.md`. `Scripts/test-sk1-audit.sh` runs on Linux in CI.
