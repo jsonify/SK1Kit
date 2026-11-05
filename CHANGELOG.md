@@ -1,5 +1,13 @@
 # Changelog
 
+## [0.4.0](https://github.com/jsonify/SK1Kit/compare/v0.3.0...v0.4.0) (2026-11-05)
+
+
+### Features
+
+* adoption guide, adopt-sk1kit skill and sk1-audit ([#9](https://github.com/jsonify/SK1Kit/issues/9)) ([b6ac8d1](https://github.com/jsonify/SK1Kit/commit/b6ac8d120ec2b8340e16dcc3a36ec191c22470dc))
+* **ui:** add launcher tiles, captioned keys, status strip, picker and knob ([#7](https://github.com/jsonify/SK1Kit/issues/7)) ([f8ccfba](https://github.com/jsonify/SK1Kit/commit/f8ccfba10a6b0f5b977d6a009dae9394e518ea16))
+
 ## [0.3.0](https://github.com/jsonify/SK1Kit/compare/v0.2.0...v0.3.0) (2026-10-31)
 
 
