@@ -36,8 +36,10 @@ rules=(
   'progress-ring ~~ \.trim\(from: ~~ an LCD (SKDisplay, SKSevenSegment, SKElapsed) for live numbers'
 )
 
-# A Toggle is fine once it has an SK-1 style on the same or the next line.
+# A Toggle is fine once it has an SK-1 style on its line or within the next few (its label, binding or other modifiers
+# can take several lines).
 toggle_rule='(^|[^A-Za-z])Toggle[[:space:]]*\('
+toggle_lookahead=5
 
 files=()
 for path in "$@"; do
@@ -60,12 +62,20 @@ report() {   # file line rule hint
 for f in "${files[@]}"; do
   n=0
   pending_toggle=""
+  pending_left=0
   while IFS= read -r line || [[ -n "$line" ]]; do
     n=$((n + 1))
-    # A Toggle on the previous line that this line styles is fine; otherwise report it now.
+    # A Toggle on an earlier line: styled here, still waiting, or out of lines (or another Toggle starts) and reported.
     if [[ -n "$pending_toggle" ]]; then
-      if ! [[ "$line" =~ toggleStyle\(\.sk1 ]]; then report "$f" "$pending_toggle" toggle '.toggleStyle(.sk1Switch) in a row, .sk1Square in a bar'; fi
-      pending_toggle=""
+      if [[ "$line" =~ toggleStyle\(\.sk1 ]]; then
+        pending_toggle=""
+      else
+        pending_left=$((pending_left - 1))
+        if [[ $pending_left -le 0 || "$line" =~ $toggle_rule ]]; then
+          report "$f" "$pending_toggle" toggle '.toggleStyle(.sk1Switch) in a row, .sk1Square in a bar'
+          pending_toggle=""
+        fi
+      fi
     fi
     [[ "$line" =~ sk1-audit:[[:space:]]*ignore ]] && continue
     trimmed="${line#"${line%%[![:space:]]*}"}"
@@ -74,7 +84,10 @@ for f in "${files[@]}"; do
       id="${rule%% ~~ *}"; rest="${rule#* ~~ }"; re="${rest%% ~~ *}"; hint="${rest#* ~~ }"
       if [[ "$line" =~ $re ]]; then report "$f" "$n" "$id" "$hint"; fi
     done
-    if [[ "$line" =~ $toggle_rule ]] && ! [[ "$line" =~ toggleStyle\(\.sk1 ]]; then pending_toggle=$n; fi
+    if [[ "$line" =~ $toggle_rule ]] && ! [[ "$line" =~ toggleStyle\(\.sk1 ]]; then
+      pending_toggle=$n
+      pending_left=$toggle_lookahead
+    fi
   done < "$f"
   if [[ -n "$pending_toggle" ]]; then report "$f" "$pending_toggle" toggle '.toggleStyle(.sk1Switch) in a row, .sk1Square in a bar'; fi
 done

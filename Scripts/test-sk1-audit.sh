@@ -15,6 +15,9 @@ for rule in form picker segmented stepper slider divider prominent bordered link
   if ! grep -q "\[$rule\]" <<<"$out"; then echo "FAIL: rule [$rule] did not fire on Native.swift"; fail=1; fi
 done
 
+toggles=$(grep -c "\[toggle\]" <<<"$out")
+if [[ $toggles -ne 2 ]]; then echo "FAIL: expected 2 unstyled toggles in Native.swift, found $toggles"; fail=1; fi
+
 "$audit" --warn Tests/AuditFixtures/Native.swift >/dev/null 2>&1 || { echo "FAIL: --warn should exit 0"; fail=1; }
 
 [[ $fail -eq 0 ]] && echo "sk1-audit: all fixture checks passed."

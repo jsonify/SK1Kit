@@ -15,6 +15,11 @@ struct AdoptedView: View {
             }
             Toggle("Mic", isOn: $on)
                 .toggleStyle(.sk1Square)
+            Toggle(isOn: Binding(get: { on },
+                                 set: { on = $0 })) {
+                Text("Styled a few lines down")
+            }
+            .toggleStyle(.sk1Square)
             SKGroove()
             SKTextField("Name", text: $text)
             Button("Save") {}.buttonStyle(.sk1Key(.orange))

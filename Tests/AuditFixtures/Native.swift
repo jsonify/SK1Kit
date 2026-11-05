@@ -25,6 +25,10 @@ struct NativeView: View {
             Text("Heading").textCase(.uppercase)
             Circle().trim(from: 0, to: 0.5)
             Toggle("Plain", isOn: $on)
+            Toggle(isOn: $on) {
+                Text("Plain, over several lines")
+            }
+            .padding()
         }
     }
 }
